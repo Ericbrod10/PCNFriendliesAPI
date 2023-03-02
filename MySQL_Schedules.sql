@@ -1,6 +1,6 @@
 
 SHOW EVENTS;
-
+--mysql -u root -p
 
 DROP EVENT UpdateMatches;
 
@@ -23,14 +23,17 @@ SET GLOBAL event_scheduler = ON;
   --Where open_or_close = 'Open' 
   
 
+
+
+
 CREATE EVENT UpdateMatches
-ON SCHEDULE EVERY 5 SECOND
+ON SCHEDULE EVERY 20 SECOND
 DO
   BEGIN
   --ENABLE Below when in production
      UPDATE api_mymodel
      SET open_or_close = 'Close'
-     WHERE open_or_close = 'Open' AND last_called < NOW() - INTERVAL 120 SECOND;
+     WHERE open_or_close = 'Open' AND last_called < NOW() - INTERVAL 30 SECOND;
 
     UPDATE api_mymodel x 
     JOIN (
@@ -89,7 +92,14 @@ DO
     WHERE a.open_or_close = 'Open';
   END;
 
-      
+
+--DROP TRIGGER my_trigger;
+
+-- CREATE TRIGGER my_trigger AFTER INSERT ON api_mymodel
+-- FOR EACH ROW
+-- BEGIN
+--   CALL mysql.UpdateMatches;
+-- END;
 
 
 
