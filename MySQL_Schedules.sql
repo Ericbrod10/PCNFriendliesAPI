@@ -37,7 +37,7 @@ DO
 
      UPDATE api_mymodel
      SET open_or_close = 'Closed'
-     WHERE open_or_close = 'Suspended' AND last_called < NOW() - INTERVAL 300 SECOND;
+     WHERE open_or_close = 'Suspended' AND SuspendMessageSent < NOW() - INTERVAL 300 SECOND;
 
 
     UPDATE api_mymodel x 
