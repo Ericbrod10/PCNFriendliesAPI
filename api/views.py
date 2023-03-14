@@ -1,9 +1,10 @@
+# pylint: disable=E1101
+
 from rest_framework.generics import CreateAPIView, RetrieveAPIView
-from .models import MyModel
+from django.views.decorators.csrf import csrf_exempt
 from .serializers import MyGetSerializer, MyPostSerializer
 from rest_framework import viewsets
-from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
+from .models import MyModel
 from .models import MyModel
 from django.utils import timezone
 from rest_framework.response import Response

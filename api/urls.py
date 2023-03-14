@@ -1,6 +1,7 @@
 from django.urls import path
-from .views import MyCreateView, MyRetrieveView, create_mymodel
 from django.contrib import admin
+from .views import MyRetrieveView, create_mymodel
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
