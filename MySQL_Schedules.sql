@@ -32,8 +32,13 @@ DO
   BEGIN
   --ENABLE Below when in production
      UPDATE api_mymodel
-     SET open_or_close = 'Close'
-     WHERE open_or_close = 'Open' AND last_called < NOW() - INTERVAL 30 SECOND;
+     SET open_or_close = 'Suspended', SuspendMessageSent = NOW()
+     WHERE open_or_close = 'Open' AND last_called < NOW() - INTERVAL 15 SECOND;
+
+     UPDATE api_mymodel
+     SET open_or_close = 'Closed'
+     WHERE open_or_close = 'Suspended' AND last_called < NOW() - INTERVAL 300 SECOND;
+
 
     UPDATE api_mymodel x 
     JOIN (

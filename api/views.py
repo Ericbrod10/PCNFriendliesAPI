@@ -7,6 +7,10 @@ from django.views.decorators.csrf import csrf_exempt
 from .models import MyModel
 from django.utils import timezone
 from rest_framework.response import Response
+import secrets
+import string
+import json
+from django.http import JsonResponse
 
 
 class MyCreateView(CreateAPIView):
@@ -26,26 +30,23 @@ class MyRetrieveView(RetrieveAPIView):
         return Response(serializer.data)
 
 
+
 @csrf_exempt
 def create_mymodel(request):
+    print('this was called')
     if request.method == 'POST':
-        data = request.POST
-        mymodel = MyModel.objects.create(
-            Unique_Idenitier=data.get('Unique_Identifier'),
-            player_name=data.get('player_name'),
-            team_name=data.get('team_name'),
-            team_league=data.get('team_league'),
-            player_numb=data.get('player_numb'),
-            match_pref=data.get('match_pref'),
-            player_pref=data.get('player_pref'),
-            open_or_close=None,
-            opponent_team=None,
-            send_v_receive=None,
-            ip=data.get('ip'),
-            device_info=None
-        )
-        return JsonResponse({'success': True, 'id': mymodel.id})
+        try:
+            data = json.loads(request.body)
+            serializer = MyPostSerializer(data=data)
+            print(serializer)
+            if serializer.is_valid():
+                unique_id = secrets.token_urlsafe(64)
+                print(unique_id)
+                mymodel = serializer.save(Unique_Identifier=unique_id)
+                return JsonResponse({'success': True, 'Unique_Identifier': mymodel.Unique_Identifier})
+            else:
+                return JsonResponse({'success': False, 'message': serializer.errors})
+        except json.decoder.JSONDecodeError as e:
+            return JsonResponse({'success': False, 'message': 'Invalid JSON data'})
     else:
         return JsonResponse({'success': False, 'message': 'Invalid request method'})
-
-
