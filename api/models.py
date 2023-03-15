@@ -10,7 +10,7 @@ class MyModel(models.Model):
     player_numb = models.CharField(max_length=6, null=False)
     match_pref = models.CharField(max_length=15, null=False)
     player_pref = models.CharField(max_length=15, null=False)
-    open_or_close = models.CharField(max_length=255, null=False, default="Open")
+    open_or_close = models.CharField(max_length=255, null=False, default="Started")
     opponent_team = models.CharField(max_length=255, null=True)
     opponent_manager = models.CharField(max_length=255, null=True)
     send_v_receive = models.CharField(max_length=255, null=True)

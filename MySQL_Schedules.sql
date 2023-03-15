@@ -32,6 +32,11 @@ DO
   BEGIN
   --ENABLE Below when in production
      UPDATE api_mymodel
+     SET open_or_close = 'Open', SuspendMessageSent = NOW()
+     WHERE open_or_close = 'Started' AND last_called != datetime;
+
+
+     UPDATE api_mymodel
      SET open_or_close = 'Suspended', SuspendMessageSent = NOW()
      WHERE open_or_close = 'Open' AND last_called < NOW() - INTERVAL 15 SECOND;
 
@@ -85,14 +90,14 @@ DO
     
     UPDATE api_mymodel a 
     JOIN api_mymodel b ON a.Opponent_Unique_Identifier = b.Unique_Identifier
-    SET a.opponent_manager = b.player_name, a.opponent_team = b.team_name, a.open_or_close = 'Close',
+    SET a.opponent_manager = b.player_name, a.opponent_team = b.team_name, a.open_or_close = 'Closed',
     a.send_v_receive = Case WHEN @result = 'heads' THEN 'Send' ELSE 'Receive' END
     WHERE a.open_or_close = 'Open';
 
 
     UPDATE api_mymodel a 
     JOIN api_mymodel b ON a.Unique_Identifier = b.Opponent_Unique_Identifier
-    SET a.Opponent_Unique_Identifier = b.Unique_Identifier, a.opponent_manager = b.player_name, a.opponent_team = b.team_name, a.open_or_close = 'Close',
+    SET a.Opponent_Unique_Identifier = b.Unique_Identifier, a.opponent_manager = b.player_name, a.opponent_team = b.team_name, a.open_or_close = 'Closed',
     a.send_v_receive = Case WHEN @result = 'tails' THEN 'Send' ELSE 'Receive' END
     WHERE a.open_or_close = 'Open';
   END;
