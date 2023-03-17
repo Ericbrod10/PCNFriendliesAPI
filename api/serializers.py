@@ -10,3 +10,9 @@ class MyGetSerializer(serializers.ModelSerializer):
     class Meta:
         model = MyModel
         fields = ['Unique_Identifier', 'player_name', 'team_name', 'team_league', 'player_numb', 'match_pref', 'player_pref', 'open_or_close', 'opponent_team', 'opponent_manager', 'send_v_receive', 'SuspendMessageSent' ]
+
+
+class MyUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = MyModel
+        fields = ('match_pref', 'player_pref')

@@ -1,6 +1,6 @@
-from rest_framework.generics import CreateAPIView, RetrieveAPIView
+from rest_framework.generics import CreateAPIView, RetrieveAPIView, UpdateAPIView
 from django.views.decorators.csrf import csrf_exempt
-from .serializers import MyGetSerializer, MyPostSerializer
+from .serializers import MyGetSerializer, MyPostSerializer, MyUpdateSerializer
 from rest_framework import viewsets
 from .models import MyModel
 from .models import MyModel
@@ -37,6 +37,24 @@ class MyRetrieveView(RetrieveAPIView):
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
         instance.last_called = timezone.now() # Update the last_accessed field
+        instance.save()
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)
+    
+class MyUpdateView(UpdateAPIView):
+    queryset = MyModel.objects.all()
+    serializer_class = MyUpdateSerializer
+    lookup_field = 'Unique_Identifier'
+
+    def partial_update(self, request, *args, **kwargs):
+        instance = self.get_object()
+        instance.last_called = timezone.now()
+        match_pref = request.data.get('match_pref', None)
+        player_pref = request.data.get('player_pref', None)
+        if match_pref is not None:
+            instance.match_pref = match_pref
+        if player_pref is not None:
+            instance.player_pref = player_pref
         instance.save()
         serializer = self.get_serializer(instance)
         return Response(serializer.data)
