@@ -1,4 +1,5 @@
 from rest_framework.generics import CreateAPIView, RetrieveAPIView, UpdateAPIView
+from rest_framework.views import APIView
 from django.views.decorators.csrf import csrf_exempt
 from .serializers import MyGetSerializer, MyPostSerializer, MyUpdateSerializer
 from rest_framework import viewsets
@@ -10,12 +11,16 @@ import secrets
 import string
 import json
 from django.http import JsonResponse
+from django.db.models import Count
 
 
+
+# Post Route
 class MyCreateView(CreateAPIView):
     queryset = MyModel.objects.all()
     serializer_class = MyPostSerializer
 
+# Get Route
 class MyRetrieveView(RetrieveAPIView):
     queryset = MyModel.objects.all()
     serializer_class = MyGetSerializer
@@ -28,7 +33,13 @@ class MyRetrieveView(RetrieveAPIView):
         serializer = self.get_serializer(instance)
         return Response(serializer.data)
     
+# Count Route
+class MyModelCountView(APIView):
+    def get(self, request, format=None):
+        count = MyModel.objects.filter(open_or_close='Open').aggregate(count=Count('id'))['count']
+        return Response({'count': count})
 
+# Update Route
 class MyUpdateView(UpdateAPIView):
     queryset = MyModel.objects.all()
     serializer_class = MyUpdateSerializer
@@ -51,6 +62,7 @@ class MyUpdateView(UpdateAPIView):
             return JsonResponse({'success': False, 'message': 'Invalid JSON data'})
 
 
+# Port Route
 @csrf_exempt
 def create_mymodel(request):
     if request.method == 'POST':
@@ -67,3 +79,5 @@ def create_mymodel(request):
             return JsonResponse({'success': False, 'message': 'Invalid JSON data'})
     else:
         return JsonResponse({'success': False, 'message': 'Invalid request method'})
+
+
