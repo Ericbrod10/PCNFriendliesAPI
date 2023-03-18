@@ -16,19 +16,6 @@ class MyCreateView(CreateAPIView):
     queryset = MyModel.objects.all()
     serializer_class = MyPostSerializer
 
-# class MyRetrieveView(RetrieveAPIView):
-#     queryset = MyModel.objects.all()
-#     serializer_class = MyGetSerializer
-#     lookup_field = 'Unique_Identifier'
-
-#     def retrieve(self, request, *args, **kwargs):
-#         instance = self.get_object()
-#         instance.last_accessed = timezone.localtime(timezone.now()) # Update the last_accessed field
-#         print(instance.last_accessed)
-#         instance.save()
-#         serializer = self.get_serializer(instance)
-#         return Response(serializer.data)
-
 class MyRetrieveView(RetrieveAPIView):
     queryset = MyModel.objects.all()
     serializer_class = MyGetSerializer
@@ -70,10 +57,8 @@ def create_mymodel(request):
         try:
             data = json.loads(request.body)
             serializer = MyPostSerializer(data=data)
-            print(serializer)
             if serializer.is_valid():
                 unique_id = secrets.token_urlsafe(64)
-                print(unique_id)
                 mymodel = serializer.save(Unique_Identifier=unique_id)
                 return JsonResponse({'success': True, 'Unique_Identifier': mymodel.Unique_Identifier})
             else:
