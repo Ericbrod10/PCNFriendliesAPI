@@ -2,7 +2,7 @@
 Done - 3/13/2023
 
 --Team Query Count query Job
-WIP - 3/17/2023
+Done - 3/17/2023
 
 --Update Match Criteria from Queue page
 Done - 3/17/2023
