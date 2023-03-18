@@ -97,4 +97,4 @@ class CloseMyModelView(APIView):
                 serializer = MyCloseModelSerializer(mymodel)
                 return Response(serializer.data, status=status.HTTP_200_OK)
         except MyModel.DoesNotExist:
-            return Response({'message': 'MyModel instance not found.'})
+            return Response({'message': 'Record Not Found.'})
