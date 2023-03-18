@@ -41,6 +41,7 @@ class MyRetrieveView(RetrieveAPIView):
         serializer = self.get_serializer(instance)
         return Response(serializer.data)
     
+
 class MyUpdateView(UpdateAPIView):
     queryset = MyModel.objects.all()
     serializer_class = MyUpdateSerializer
