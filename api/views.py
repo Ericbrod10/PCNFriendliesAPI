@@ -1,7 +1,7 @@
 from rest_framework.generics import CreateAPIView, RetrieveAPIView, UpdateAPIView
 from rest_framework.views import APIView
 from django.views.decorators.csrf import csrf_exempt
-from .serializers import MyGetSerializer, MyPostSerializer, MyUpdateSerializer
+from .serializers import MyGetSerializer, MyPostSerializer, MyUpdateSerializer, MyCloseModelSerializer
 from rest_framework import viewsets
 from .models import MyModel
 from .models import MyModel
@@ -12,6 +12,7 @@ import string
 import json
 from django.http import JsonResponse
 from django.db.models import Count
+from rest_framework import status
 
 
 
@@ -81,3 +82,19 @@ def create_mymodel(request):
         return JsonResponse({'success': False, 'message': 'Invalid request method'})
 
 
+
+
+class CloseMyModelView(APIView):
+    def put(self, request, *args, **kwargs):
+        unique_id = self.kwargs.get('Unique_Identifier')
+        try:
+            mymodel = MyModel.objects.get(Unique_Identifier=unique_id)
+            if mymodel.Opponent_Unique_Identifier is not None:
+                return Response({'message': 'Opponent Already Found Cannot Close Out'})
+            else:
+                mymodel.open_or_close = 'Close'
+                mymodel.save()
+                serializer = MyCloseModelSerializer(mymodel)
+                return Response(serializer.data, status=status.HTTP_200_OK)
+        except MyModel.DoesNotExist:
+            return Response({'message': 'MyModel instance not found.'})

@@ -15,3 +15,6 @@ Done - 3/13/2023
 
 --Added Post Attack Protection
 Done - 3/15/2023
+
+--Add Close Functionality
+WIP

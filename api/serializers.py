@@ -16,3 +16,10 @@ class MyUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = MyModel
         fields = ('match_pref', 'player_pref')
+
+
+
+class MyCloseModelSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = MyModel
+        fields = ('Unique_Identifier', 'open_or_close', 'Opponent_Unique_Identifier', 'match_pref', 'player_pref')
