@@ -46,19 +46,21 @@ class MyUpdateView(UpdateAPIView):
     serializer_class = MyUpdateSerializer
     lookup_field = 'Unique_Identifier'
 
-    def partial_update(self, request, *args, **kwargs):
-        instance = self.get_object()
-        instance.last_called = timezone.now()
-        match_pref = request.data.get('match_pref', None)
-        player_pref = request.data.get('player_pref', None)
-        if match_pref is not None:
-            instance.match_pref = match_pref
-        if player_pref is not None:
-            instance.player_pref = player_pref
-        instance.save()
-        serializer = self.get_serializer(instance)
-        return Response(serializer.data)
-
+    def patch(self, request, *args, **kwargs):
+        try:
+            data = json.loads(request.body)
+            partial = kwargs.pop('partial', True)
+            instance = self.get_object()
+            instance.last_called = timezone.now()
+            serializer = self.get_serializer(instance, data=data, partial=partial)
+            if serializer.is_valid():
+                unique_id = instance.Unique_Identifier
+                serializer.save()
+                return JsonResponse({'success': True, 'Unique_Identifier': unique_id})
+            else:
+                return JsonResponse({'success': False, 'message': serializer.errors})
+        except json.decoder.JSONDecodeError as e:
+            return JsonResponse({'success': False, 'message': 'Invalid JSON data'})
 
 
 @csrf_exempt
