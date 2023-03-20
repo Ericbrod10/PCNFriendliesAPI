@@ -107,12 +107,14 @@ class ResumeMyModelView(APIView):
             mymodel = MyModel.objects.get(Unique_Identifier=unique_id)
             if mymodel.open_or_close == 'Suspended' and mymodel.SuspendMessageSent + timezone.timedelta(minutes=5) < timezone.now():
                 return Response({'message': 'Failed to Rejoin Queue, Passed 5 minutes'})
-            else:
+            elif mymodel.open_or_close == 'Suspended' and mymodel.SuspendMessageSent + timezone.timedelta(minutes=5) > timezone.now():
                 mymodel.open_or_close = 'Open'
                 mymodel.SuspendMessageSent = None
                 mymodel.last_called = timezone.now()
                 mymodel.save()
-                serializer = MyCloseModelSerializer(mymodel)
+                serializer = MyGetSerializer(mymodel)
                 return Response(serializer.data, status=status.HTTP_200_OK)
+            else:
+                return Response({'message': 'Record already closed'})
         except MyModel.DoesNotExist:
             return Response({'message': 'Record Not Found.'})
