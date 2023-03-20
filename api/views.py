@@ -105,7 +105,7 @@ class ResumeMyModelView(APIView):
         unique_id = self.kwargs.get('Unique_Identifier')
         try:
             mymodel = MyModel.objects.get(Unique_Identifier=unique_id)
-            if mymodel.open_or_close == 'Suspended' and mymodel.SuspendMessageSent + timezone.timedelta(minutes=5) < timezone.now():
+            if mymodel.open_or_close == 'Suspended' and mymodel.SuspendMessageSent + timezone.timedelta(minutes=5) <= timezone.now():
                 return Response({'message': 'Failed to Rejoin Queue, Passed 5 minutes'})
             elif mymodel.open_or_close == 'Suspended' and mymodel.SuspendMessageSent + timezone.timedelta(minutes=5) > timezone.now():
                 mymodel.open_or_close = 'Open'
