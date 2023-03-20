@@ -14,7 +14,7 @@ services:
       MYSQL_ROOT_PASSWORD: root123
     volumes:
       - ./server/.dbdata:/var/lib/mysql
-
+    command: --event-scheduler=ON
   web:
     build: .
     command: python manage.py runserver 0.0.0.0:8000
