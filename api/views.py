@@ -92,7 +92,25 @@ class CloseMyModelView(APIView):
             if mymodel.Opponent_Unique_Identifier is not None:
                 return Response({'message': 'Opponent Already Found Cannot Close Out'})
             else:
-                mymodel.open_or_close = 'Close'
+                mymodel.open_or_close = 'Closed'
+                mymodel.save()
+                serializer = MyCloseModelSerializer(mymodel)
+                return Response(serializer.data, status=status.HTTP_200_OK)
+        except MyModel.DoesNotExist:
+            return Response({'message': 'Record Not Found.'})
+        
+
+class ResumeMyModelView(APIView):
+    def put(self, request, *args, **kwargs):
+        unique_id = self.kwargs.get('Unique_Identifier')
+        try:
+            mymodel = MyModel.objects.get(Unique_Identifier=unique_id)
+            if mymodel.open_or_close == 'Suspended' and mymodel.SuspendMessageSent + timezone.timedelta(minutes=5) < timezone.now():
+                return Response({'message': 'Failed to Rejoin Queue, Passed 5 minutes'})
+            else:
+                mymodel.open_or_close = 'Open'
+                mymodel.SuspendMessageSent = None
+                mymodel.last_called = timezone.now()
                 mymodel.save()
                 serializer = MyCloseModelSerializer(mymodel)
                 return Response(serializer.data, status=status.HTTP_200_OK)
