@@ -34,6 +34,10 @@ DO
      UPDATE api_mymodel
      SET open_or_close = 'Open', SuspendMessageSent = NOW()
      WHERE open_or_close = 'Started' AND last_called != datetime;
+     
+     UPDATE api_mymodel
+     SET open_or_close = 'Closed'
+     WHERE open_or_close = 'Started' AND datetime < NOW() - INTERVAL 60 SECOND;
 
 
      UPDATE api_mymodel

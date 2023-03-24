@@ -13,6 +13,7 @@ import json
 from django.http import JsonResponse
 from django.db.models import Count
 from rest_framework import status
+from django.db.models import Q
 
 
 
@@ -37,7 +38,7 @@ class MyRetrieveView(RetrieveAPIView):
 # Count Route
 class MyModelCountView(APIView):
     def get(self, request, format=None):
-        count = MyModel.objects.filter(open_or_close='Open').aggregate(count=Count('id'))['count']
+        count = MyModel.objects.filter(Q(open_or_close='Open') | Q(open_or_close='Started')).aggregate(count=Count('id'))['count']
         return Response({'count': count})
 
 # Update Route
