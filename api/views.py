@@ -74,6 +74,7 @@ def create_mymodel(request):
             if serializer.is_valid():
                 unique_id = secrets.token_urlsafe(64)
                 mymodel = serializer.save(Unique_Identifier=unique_id)
+                print({'success': True, 'Unique_Identifier': mymodel.Unique_Identifier})
                 return JsonResponse({'success': True, 'Unique_Identifier': mymodel.Unique_Identifier})
             else:
                 return JsonResponse({'success': False, 'message': serializer.errors})
