@@ -1,0 +1,23 @@
+.header-mobile {
+    background-color: blue;
+    margin-left: -20px;
+    text-align: center;
+  }
+  
+  .header-logo__img {
+    width: 25%;
+    margin: auto;
+  }
+  
+  @media only screen and (max-width: 600px) {
+    .header-logo__img {
+      width: 40%;
+    }
+  }
+  
+  @media only screen and (min-width: 601px) {
+    .header-logo__img {
+      width: 10%;
+      text-align: left;
+    }
+  }

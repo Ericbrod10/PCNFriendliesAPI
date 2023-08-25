@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Fingerprint2 from 'fingerprintjs2';
 import { SHA256 } from 'crypto-js';
+import './styles.css';
 
 function CreateMyModelForm() {
   const [formData, setFormData] = useState({
@@ -31,7 +32,7 @@ function CreateMyModelForm() {
   const [opponent_team, setopponent_team ] = useState('');
   const [send_v_receive, setopponent_send_v_receive] = useState('');
   const [elapsedTime, setElapsedTime] = useState(0);
-
+  const [errors, setErrors] = useState({});
 
   const handleChange = (event) => {
     setFormData({
@@ -43,7 +44,7 @@ function CreateMyModelForm() {
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
-      const response = await axios.post('http://localhost:8000/api/myendpoint/', formData);
+      const response = await axios.post('http://192.168.1.243:8000/api/myendpoint/', formData);
       console.log(response.data);
       console.log(response.data.success);
       if (response.data.success === true) {
@@ -51,7 +52,8 @@ function CreateMyModelForm() {
       setInQueue(true); // Show the timer
       setUniqueIdentifier(response.data.Unique_Identifier);
       console.log(response.data.Unique_Identifier); // Set the unique identifier
-    } else console.log(response)} catch (error) {
+    } else setErrors(response.data.message);
+  } catch (error) {
       console.error(error);
     }
   };
@@ -80,7 +82,7 @@ function CreateMyModelForm() {
     if (InQueue) {
       const fetchData = async () => {
         try {
-          const response1 = await axios.get(`http://localhost:8000/api/myendpoint/${uniqueIdentifier}/`);
+          const response1 = await axios.get(`http://192.168.1.243:8000/api/myendpoint/${uniqueIdentifier}/`);
           console.log(response1.data);
           // Set each field to variable 
           setPlayerName(response1.data.player_name); //
@@ -106,7 +108,7 @@ function CreateMyModelForm() {
           console.error(error);
         }
         try {
-          const response2 = await axios.get('http://localhost:8000/api/opencount/');
+          const response2 = await axios.get('http://192.168.1.243:8000/api/opencount/');
           console.log(response2.data);
           setOpenCount(response2.data.count); // Set the open count
         } catch (error) {
@@ -128,49 +130,92 @@ function CreateMyModelForm() {
   
       return () => clearInterval(interval);
     }
+    // eslint-disable-next-line
   }, [InQueue, uniqueIdentifier]);
   
   const minutes = Math.floor(elapsedTime / 60);
   const seconds = elapsedTime % 60
 
   return (
-    <div>
-      {showForm && (
-        <form onSubmit={handleSubmit}>
-          <label>
-            Player Name:
-            <input type="text" name="player_name" value={formData.player_name} onChange={handleChange} />
-          </label>
-          <br />
-          <label>
-            Team Name:
-            <input type="text" name="team_name" value={formData.team_name} onChange={handleChange} />
-          </label>
-          <br />
-          <label>
-            Team League:
-            <input type="text" name="team_league" value={formData.team_league} onChange={handleChange} />
-          </label>
-          <br />
-          <label>
-            Player Number:
-            <input type="text" name="player_numb" value={formData.player_numb} onChange={handleChange} />
-          </label>
-          <br />
-          <label>
-            Match Preference:
-            <input type="text" name="match_pref" value={formData.match_pref} onChange={handleChange} />
-          </label>
-          <br />
-          <label>
-            Player Preference:
-            <input type="text" name="player_pref" value={formData.player_pref} onChange={handleChange} />
-          </label>
-          <br />
+    
+<div>
 
-          <button type="submit">Submit</button>
-        </form>
-      )}
+    
+<div className="header-mobile clearfix" id="header-mobile">
+      <div className="header-mobile__logo">
+        <a href="https://proclubsnation.com/" rel="home">
+          <img src="https://proclubsnation.com/wp-content/uploads/2020/08/PCN_logo_Best.png" className="header-logo__img" alt="Pro Clubs Nation" />
+        </a>
+      </div>
+    </div>
+
+<div className="center2" style={{ textAlign: 'left', margin: 'auto', marginLeft: '20px'}}>
+
+{showForm && (
+  <form onSubmit={handleSubmit}>
+    <label>
+      Player Name:
+      <br />
+      <input type="text" name="player_name" value={formData.player_name} onChange={handleChange} />
+      {errors.player_name && <span style={{ color: 'red' }}>{errors.player_name}</span>}
+    </label>
+    <br />
+    <label>
+      Team Name (Exactly as it appears in-game):
+      <br />
+      <input type="text" name="team_name" value={formData.team_name} onChange={handleChange} />
+      {errors.team_name && <span style={{ color: 'red' }}>{errors.team_name}</span>}
+    </label>
+
+    <br />
+    <label>
+      <select name="team_league" value={formData.team_league} onChange={handleChange}>
+        <option value="">Select your League</option>
+        <option value="SL">Super League</option>
+        <option value="L1">League 1</option>
+      </select>
+      {errors.team_league && <span style={{ color: 'red' }}>{errors.team_league}</span>}
+    </label>
+
+    <label>
+      <select name="player_numb" value={formData.player_numb} onChange={handleChange}>
+        <option value="">Select your # of Players</option>
+        <option value="Full">Full 11</option>
+        <option value="10GK">10 with a GK</option>
+        <option value="10NoGK">10 without a GK</option>
+        <option value="Less10">Less than 10</option>
+      </select>
+      {errors.player_numb && <span style={{ color: 'red' }}>{errors.player_numb}</span>}
+    </label>
+    <br />
+    <br />
+    <label>
+      <label>
+  <input type="radio" name="match_pref" value="Any" checked={formData.match_pref === 'Any'} onChange={handleChange} />
+  Match to Teams in any League<br />
+</label>
+<label>
+  <input type="radio" name="match_pref" value="Match" checked={formData.match_pref === 'Match'} onChange={handleChange} />
+   Only Match Teams in Current League - <b>May increase wait times</b>  <br /> 
+</label>
+      <br />
+    </label>
+    <label>
+      <label>
+        <input type="radio" name="player_pref" value="Any" checked={formData.player_pref === 'Any'} onChange={handleChange} />
+        Match Teams with any # of Players
+        <br />
+      </label>
+      <label>
+        <input type="radio" name="player_pref" value="Match" checked={formData.player_pref === 'Match'} onChange={handleChange} />
+        Only Match Teams with the Same # of Players - <b>May increase wait times</b> < br />
+      </label>
+    </label>
+    <br />
+    
+    <button type="submit" class="btn btn-success" style={{ backgroundColor: 'green', fontSize: '16px', color: 'white', fontWeight: 'bold' }}>Submit</button>
+  </form>
+)}
       {InQueue && (
         <div>
           <p>Elapsed Time: {minutes}:{seconds < 10 ? `0${seconds}` : seconds}</p>
@@ -196,10 +241,9 @@ function CreateMyModelForm() {
           <p>The other manager is: <b>{opponent_manager}</b></p>
           <p>Reach out to the other manager if there are any issues accepting or sending.</p>
 
-          
-
     </div>
       )}
+    </div>
     </div>
   );
 }
