@@ -120,7 +120,7 @@ function CreateMyModelForm() {
   
       const interval = setInterval(() => {
         fetchData();
-      }, 15000);
+      }, 7500);
       // eslint-disable-next-line
       let intervalId;
       // eslint-disable-next-line
