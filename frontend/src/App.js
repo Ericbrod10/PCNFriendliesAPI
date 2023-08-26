@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useReducer  } from 'react';
 import axios from 'axios';
 import Fingerprint2 from 'fingerprintjs2';
 import { SHA256 } from 'crypto-js';
@@ -10,8 +10,8 @@ function CreateMyModelForm() {
     team_name: '',
     team_league: '',
     player_numb: '',
-    match_pref: '',
-    player_pref: '',
+    match_pref: 'Any',
+    player_pref: 'Any',
     ip: '',
     device_info: '',
   });
@@ -21,18 +21,34 @@ function CreateMyModelForm() {
   const [showmatched, setmatched] = useState(false);
   const [uniqueIdentifier, setUniqueIdentifier] = useState('');
   const [openCount, setOpenCount] = useState(0);
+  // eslint-disable-next-line
   const [player_name, setPlayerName] = useState('');
   const [team_name, setTeamName] = useState('');
   const [team_league, setTeamLeague] = useState('');
+  // eslint-disable-next-line
   const [player_numb, setPlayerNumb] = useState('');
   const [match_pref, setMatchPref] = useState('');
   const [player_pref, setPlayerPref] = useState('');
+  // eslint-disable-next-line
   const [open_or_close, setOpenOrClosed] = useState('');
   const [opponent_manager, setopponent_manager] = useState('');
   const [opponent_team, setopponent_team ] = useState('');
   const [send_v_receive, setopponent_send_v_receive] = useState('');
-  const [elapsedTime, setElapsedTime] = useState(0);
   const [errors, setErrors] = useState({});
+  
+  
+  const [elapsedTime, dispatch] = useReducer((state, action) => {
+    switch (action.type) {
+      case 'reset':
+        return 0;
+      case 'tick':
+        return state + 1;
+      default:
+        return state;
+    }
+  }, 0);
+
+
 
   const handleChange = (event) => {
     setFormData({
@@ -58,7 +74,30 @@ function CreateMyModelForm() {
     }
   };
 
+  const handleLeaveQueue = () => {
+    axios.put(`http://192.168.1.243:8000/api/myendpoint/${uniqueIdentifier}/close/`)
+      .then(response => {
+        console.log(response.data);
+        setInQueue(false);
+        setShowForm(true);
+        setPlayerName('');
+        setTeamName('');
+        setTeamLeague('');
+        setPlayerNumb('');
+        setMatchPref('Any');
+        setPlayerPref('Any');
+        setOpenCount(0);        
+        dispatch({ type: 'reset' });
+
+
+      })
+      .catch(error => {
+        console.log(error);
+      });
+  };
+
   useEffect(() => {
+
     if (showForm) {
       Fingerprint2.get(function(result, components) {
         const hashedFingerprint = SHA256(result).toString();
@@ -76,6 +115,16 @@ function CreateMyModelForm() {
       .catch(error => {
         console.error(error);
       });
+      const fetchData = async () => {
+        try {
+          const response = await axios.get('http://192.168.1.243:8000/api/opencount/');
+          setOpenCount(response.data.count); // Set the open count
+        } catch (error) {
+          console.error(error);
+        }
+      };
+      fetchData();
+      
       
     }
   
@@ -85,12 +134,15 @@ function CreateMyModelForm() {
           const response1 = await axios.get(`http://192.168.1.243:8000/api/myendpoint/${uniqueIdentifier}/`);
           console.log(response1.data);
           // Set each field to variable 
-          setPlayerName(response1.data.player_name); //
+          // eslint-disable-next-line
+          setPlayerName(response1.data.player_name); 
           setTeamName(response1.data.team_name);
           setTeamLeague(response1.data.team_league);
+          // eslint-disable-next-line
           setPlayerNumb(response1.data.player_numb);
           setMatchPref(response1.data.match_pref);
           setPlayerPref(response1.data.player_pref);
+          // eslint-disable-next-line
           setOpenOrClosed(response1.data.open_or_close);
           // if response1.data.Opponent_Unique_Identifier is not null, then state = 'MatchedScreen'
           
@@ -117,21 +169,22 @@ function CreateMyModelForm() {
       };
   
       fetchData();
-  
       const interval = setInterval(() => {
         fetchData();
       }, 7500);
-      // eslint-disable-next-line
-      let intervalId;
-      // eslint-disable-next-line
-      intervalId = setInterval(() => {
-        setElapsedTime(prevElapsedTime => prevElapsedTime + 1);
+      const interval2 = setInterval(() => {
+        dispatch({ type: 'tick' });
       }, 1000);
-  
-      return () => clearInterval(interval);
+      // eslint-disable-next-line
+      return () => {      
+        clearInterval(interval);
+        clearInterval(interval2);
+      };
     }
+    
     // eslint-disable-next-line
-  }, [InQueue, uniqueIdentifier]);
+  }, [InQueue, uniqueIdentifier, dispatch]);
+  
   
   const minutes = Math.floor(elapsedTime / 60);
   const seconds = elapsedTime % 60
@@ -150,9 +203,11 @@ function CreateMyModelForm() {
     </div>
 
 <div className="center2" style={{ textAlign: 'left', margin: 'auto', marginLeft: '20px'}}>
+<h3>Pro Clubs Nation's Friendly Queue </h3>
 
 {showForm && (
   <form onSubmit={handleSubmit}>
+    <h4>Please fill out the information below to sign up for the queue:</h4>
     <label>
       Player Name:
       <br />
@@ -189,54 +244,55 @@ function CreateMyModelForm() {
     </label>
     <br />
     <br />
+    <b>Queue Preferences:</b>
+    <br />
     <label>
       <label>
-  <input type="radio" name="match_pref" value="Any" checked={formData.match_pref === 'Any'} onChange={handleChange} />
+  <input type="radio" name="match_pref" value="Any" checked={formData.match_pref === 'Any'|| formData.match_pref === ''} onChange={handleChange} />
   Match to Teams in any League<br />
 </label>
 <label>
   <input type="radio" name="match_pref" value="Match" checked={formData.match_pref === 'Match'} onChange={handleChange} />
-   Only Match Teams in Current League - <b>May increase wait times</b>  <br /> 
+   Only Match Teams in Current League<br /> &nbsp;&nbsp;&nbsp;&nbsp; - <b>May increase wait times</b>  <br /> 
 </label>
       <br />
     </label>
     <label>
       <label>
-        <input type="radio" name="player_pref" value="Any" checked={formData.player_pref === 'Any'} onChange={handleChange} />
+        <input type="radio" name="player_pref" value="Any" checked={formData.player_pref === 'Any'|| formData.match_pref === ''} onChange={handleChange} />
         Match Teams with any # of Players
         <br />
       </label>
       <label>
         <input type="radio" name="player_pref" value="Match" checked={formData.player_pref === 'Match'} onChange={handleChange} />
-        Only Match Teams with the Same # of Players - <b>May increase wait times</b> < br />
+        Only Match Teams with the Same # of Players <br /> &nbsp;&nbsp;&nbsp;&nbsp; - <b>May increase wait times</b> < br />
       </label>
     </label>
-    <br />
+    <p>Current Number of Teams waiting in queue: <b>{openCount}</b></p>
     
-    <button type="submit" class="btn btn-success" style={{ backgroundColor: 'green', fontSize: '16px', color: 'white', fontWeight: 'bold' }}>Submit</button>
+    <button type="submit" className ="btn btn-success" style={{ backgroundColor: 'green', fontSize: '20px', color: 'white', fontWeight: 'bold', padding: '10px 20px' }}>Submit</button>
   </form>
 )}
       {InQueue && (
         <div>
-          <p>Elapsed Time: {minutes}:{seconds < 10 ? `0${seconds}` : seconds}</p>
-          <p>Player Name: {player_name}</p>
+          <p><b>Elapsed Time: </b>{minutes}:{seconds < 10 ? `0${seconds}` : seconds}</p>
           <p>Team Name: {team_name}</p>
           <p>Team League: {team_league}</p>
-          <p>Player Number: {player_numb}</p>
           <p>Match Preference: {match_pref}</p>
           <p>Player Preference: {player_pref}</p>
-          <p>Open or Closed: {open_or_close}</p>
-          <p>Open Count: {openCount}</p>
+          <p>Number of teams in queue: {openCount}</p>
+          <button style={{ backgroundColor: 'red', color: 'white', padding: '10px 20px', fontWeight: 'bold' }} onClick={handleLeaveQueue}>Leave Queue</button>
+          <p style={{ color: 'red' }}><b>Note:</b> If you find a match outside of the queue please Leave Queue ASAP, repeated failure to so may result in league punishments.</p>
         </div>
       )}
       {showmatched && (
         <div>
-          <h3>Match Found!</h3>
+          <p style={{ fontSize: '20px' }}><b>Match Found!</b></p>
           {send_v_receive === 'Send' && (
-        <h3>Send a friendly invite to: {opponent_team}</h3>
+        <p><b>Send</b> a friendly invite to: <b>{opponent_team}</b></p>
       )}
       {send_v_receive === 'Receive' && (
-        <h3>Accept a friendly invite from: {opponent_team}</h3>
+        <p><b>Accept</b> a friendly invite from: <b>{opponent_team}</b></p>
       )}
           <p>The other manager is: <b>{opponent_manager}</b></p>
           <p>Reach out to the other manager if there are any issues accepting or sending.</p>
