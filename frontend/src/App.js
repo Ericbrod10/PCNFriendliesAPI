@@ -15,7 +15,8 @@ function CreateMyModelForm() {
     ip: '',
     device_info: '',
   });
-
+  //const LocalHost = '100.1.213.155';
+  const LocalHost = '192.168.1.243';
   const [showForm, setShowForm] = useState(true);
   const [InQueue, setInQueue] = useState(false);
   const [showmatched, setmatched] = useState(false);
@@ -60,7 +61,7 @@ function CreateMyModelForm() {
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
-      const response = await axios.post('http://192.168.1.243:8000/api/myendpoint/', formData);
+      const response = await axios.post(`http://${LocalHost}:8000/api/myendpoint/`, formData);
       console.log(response.data);
       console.log(response.data.success);
       if (response.data.success === true) {
@@ -75,7 +76,7 @@ function CreateMyModelForm() {
   };
 
   const handleLeaveQueue = () => {
-    axios.put(`http://192.168.1.243:8000/api/myendpoint/${uniqueIdentifier}/close/`)
+    axios.put(`http://${LocalHost}:8000/api/myendpoint/${uniqueIdentifier}/close/`)
       .then(response => {
         console.log(response.data);
         setInQueue(false);
@@ -117,7 +118,7 @@ function CreateMyModelForm() {
       });
       const fetchData = async () => {
         try {
-          const response = await axios.get('http://192.168.1.243:8000/api/opencount/');
+          const response = await axios.get(`http://${LocalHost}:8000/api/opencount/`);
           setOpenCount(response.data.count); // Set the open count
         } catch (error) {
           console.error(error);
@@ -131,7 +132,7 @@ function CreateMyModelForm() {
     if (InQueue) {
       const fetchData = async () => {
         try {
-          const response1 = await axios.get(`http://192.168.1.243:8000/api/myendpoint/${uniqueIdentifier}/`);
+          const response1 = await axios.get(`http://${LocalHost}:8000/api/myendpoint/${uniqueIdentifier}/`);
           console.log(response1.data);
           // Set each field to variable 
           // eslint-disable-next-line
@@ -160,7 +161,7 @@ function CreateMyModelForm() {
           console.error(error);
         }
         try {
-          const response2 = await axios.get('http://192.168.1.243:8000/api/opencount/');
+          const response2 = await axios.get(`http://${LocalHost}:8000/api/opencount/`);
           console.log(response2.data);
           setOpenCount(response2.data.count); // Set the open count
         } catch (error) {
