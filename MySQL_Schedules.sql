@@ -27,10 +27,10 @@ SET GLOBAL event_scheduler = ON;
 
 
 CREATE EVENT UpdateMatches
-ON SCHEDULE EVERY 20 SECOND
+ON SCHEDULE EVERY 7 SECOND
 DO
   BEGIN
-  --ENABLE Below when in production
+  /*ENABLE Below when in production*/
      UPDATE api_mymodel
      SET open_or_close = 'Open', SuspendMessageSent = NOW()
      WHERE open_or_close = 'Started' AND last_called != datetime;
@@ -60,19 +60,19 @@ DO
       b.open_or_close = 'Open'
         
         AND 
-        --Players = Players AND Teams = Teams
+        /*Players = Players AND Teams = Teams*/
         ((a.player_numb = b.player_numb
         AND 
         a.team_league = b.team_league) 
         OR
-        --Same League match Any Players
+        /*Same League match Any Players*/
         (a.player_pref = 'ANY' AND (b.player_pref = 'ANY' OR a.player_numb = b.player_numb)
         AND 
         a.team_league = b.team_league
         AND a.match_pref = 'Current') 
         
         OR
-        --Same players match Any League
+        /*Same players match Any League*/
         (a.player_numb = b.player_numb 
         AND 
         a.match_pref = 'Any' AND (b.match_pref = 'Any' OR a.team_league = b.team_league)) 
@@ -88,7 +88,7 @@ DO
     ) y ON x.Unique_Identifier = y.Unique_Identifier
     SET x.Opponent_Unique_Identifier = y.Opponent_Unique_Identifier;
 
-    --Flip a coin and store the results as a variable
+    /*Flip a coin and store the results as a variable*/
     SET @result = (SELECT IF(RAND() < 0.5, 'heads', 'tails'));
 
     
@@ -106,14 +106,6 @@ DO
     WHERE a.open_or_close = 'Open';
   END;
 
-
---DROP TRIGGER my_trigger;
-
--- CREATE TRIGGER my_trigger AFTER INSERT ON api_mymodel
--- FOR EACH ROW
--- BEGIN
---   CALL mysql.UpdateMatches;
--- END;
 
 
 
