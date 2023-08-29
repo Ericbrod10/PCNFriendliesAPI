@@ -4,6 +4,7 @@ import Fingerprint2 from 'fingerprintjs2';
 import { SHA256 } from 'crypto-js';
 import './styles.css';
 
+
 function CreateMyModelForm() {
   const [formData, setFormData] = useState({
     player_name: '',
@@ -15,9 +16,9 @@ function CreateMyModelForm() {
     ip: '',
     device_info: '',
   });
-  //const LocalHost = '100.1.213.155';
-  const LocalHost = '192.168.1.243';
-  const [showForm, setShowForm] = useState(true);
+  const LocalHost = '100.1.213.155';
+  //const LocalHost = '192.168.1.243';
+  const [showForm, setShowForm] = useState(true); 
   const [InQueue, setInQueue] = useState(false);
   const [showmatched, setmatched] = useState(false);
   const [uniqueIdentifier, setUniqueIdentifier] = useState('');
@@ -37,7 +38,10 @@ function CreateMyModelForm() {
   const [send_v_receive, setopponent_send_v_receive] = useState('');
   const [errors, setErrors] = useState({});
   
-  
+
+  //const client = new ClientJS();
+
+
   const [elapsedTime, dispatch] = useReducer((state, action) => {
     switch (action.type) {
       case 'reset':
@@ -100,14 +104,30 @@ function CreateMyModelForm() {
   useEffect(() => {
 
     if (showForm) {
-      Fingerprint2.get(function(result, components) {
+      const options = {
+        excludeJsFonts: true,
+        excludeWebGL: true,
+        excludeCanvas: true,
+        excludeAdBlock: true,
+      };
+  
+      Fingerprint2.get(options, function(components) {
+        const values = components.map(component => component.value);
+        const result = values.join('');
+  
         const hashedFingerprint = SHA256(result).toString();
-        formData.device_info = {
-          fingerprint: hashedFingerprint,
-          components: components
+  
+        const formData = {
+          device_info: {
+            fingerprint: hashedFingerprint,
+            components: components,
+          },
         };
-        formData.device_info = formData.device_info.fingerprint.toString();
+  
+        console.log(formData.device_info);
+        console.log(components);
       });
+
 
       axios.get('https://api.ipify.org?format=json')
       .then(response => {
@@ -277,11 +297,11 @@ function CreateMyModelForm() {
       {InQueue && (
         <div>
           <p><b>Elapsed Time: </b>{minutes}:{seconds < 10 ? `0${seconds}` : seconds}</p>
-          <p>Team Name: {team_name}</p>
-          <p>Team League: {team_league}</p>
-          <p>Match Preference: {match_pref}</p>
-          <p>Player Preference: {player_pref}</p>
-          <p>Number of teams in queue: {openCount}</p>
+          <p>Team Name: <b>{team_name}</b></p>
+          <p>Team League: <b>{team_league}</b></p>
+          <p>Match Preference: <b>{match_pref}</b></p>
+          <p>Player Preference: <b>{player_pref}</b></p>
+          <p>Number of teams in queue: <b>{openCount}</b></p>
           <button style={{ backgroundColor: 'red', color: 'white', padding: '10px 20px', fontWeight: 'bold' }} onClick={handleLeaveQueue}>Leave Queue</button>
           <p style={{ color: 'red' }}><b>Note:</b> If you find a match outside of the queue please Leave Queue ASAP, repeated failure to so may result in league punishments.</p>
         </div>
@@ -298,6 +318,7 @@ function CreateMyModelForm() {
           <p>The other manager is: <b>{opponent_manager}</b></p>
           <p>Reach out to the other manager if there are any issues accepting or sending.</p>
 
+          <p>If you suspect someone of queue dodging report it to an admin immediately</p>
     </div>
       )}
     </div>
