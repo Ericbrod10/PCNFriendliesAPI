@@ -114,20 +114,9 @@ function CreateMyModelForm() {
       Fingerprint2.get(options, function(components) {
         const values = components.map(component => component.value);
         const result = values.join('');
-  
-        const hashedFingerprint = SHA256(result).toString();
-  
-        const formData = {
-          device_info: {
-            fingerprint: hashedFingerprint,
-            components: components,
-          },
-        };
-  
-        console.log(formData.device_info);
-        console.log(components);
+        formData.device_info = SHA256(result).toString();
       });
-
+      
 
       axios.get('https://api.ipify.org?format=json')
       .then(response => {
@@ -299,11 +288,11 @@ function CreateMyModelForm() {
           <p><b>Elapsed Time: </b>{minutes}:{seconds < 10 ? `0${seconds}` : seconds}</p>
           <p>Team Name: <b>{team_name}</b></p>
           <p>Team League: <b>{team_league}</b></p>
-          <p>Match Preference: <b>{match_pref}</b></p>
-          <p>Player Preference: <b>{player_pref}</b></p>
+          <p>Match Preference: <b>{match_pref} League</b></p>
+          <p>Player Preference: <b>{player_pref} # of Players</b></p>
           <p>Number of teams in queue: <b>{openCount}</b></p>
           <button style={{ backgroundColor: 'red', color: 'white', padding: '10px 20px', fontWeight: 'bold' }} onClick={handleLeaveQueue}>Leave Queue</button>
-          <p style={{ color: 'red' }}><b>Note:</b> If you find a match outside of the queue please Leave Queue ASAP, repeated failure to so may result in league punishments.</p>
+          <p style={{ color: 'red' }}><b>Note:</b> If you find a match outside of the queue please Leave Queue ASAP, repeated failure to do so may result in league punishments.</p>
         </div>
       )}
       {showmatched && (
@@ -318,7 +307,7 @@ function CreateMyModelForm() {
           <p>The other manager is: <b>{opponent_manager}</b></p>
           <p>Reach out to the other manager if there are any issues accepting or sending.</p>
 
-          <p>If you suspect someone of queue dodging report it to an admin immediately</p>
+          <p style={{ color: 'red' }}>If you suspect someone of queue dodging, report it to an Admin Immediately.</p>
     </div>
       )}
     </div>
