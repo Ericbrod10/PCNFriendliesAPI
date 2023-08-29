@@ -307,7 +307,8 @@ function CreateMyModelForm() {
           <p>The other manager is: <b>{opponent_manager}</b></p>
           <p>Reach out to the other manager if there are any issues accepting or sending.</p>
 
-          <p style={{ color: 'red' }}>If you suspect someone of queue dodging, report it to an Admin Immediately.</p>
+          <p style={{ color: 'red' }}>If you suspect someone of queue dodging, report it to an admin immediately.</p>
+          
     </div>
       )}
     </div>
