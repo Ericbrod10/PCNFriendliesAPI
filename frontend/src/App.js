@@ -16,12 +16,17 @@ function CreateMyModelForm() {
     ip: '',
     device_info: '',
   });
+
+
   const LocalHost = '100.1.213.155';
   //const LocalHost = '192.168.1.243';
-  const [showForm, setShowForm] = useState(true); 
-  const [InQueue, setInQueue] = useState(false);
-  const [showmatched, setmatched] = useState(false);
-  const [uniqueIdentifier, setUniqueIdentifier] = useState('');
+  
+
+  //const [pageState, setPageState] = useState('Form');
+  //const [InQueue, setInQueue] = useState(false);
+  //const [showmatched, setmatched] = useState(false);
+  //const [SuspendQueue, setSuspendQueue] = useState(false);
+  //const [uniqueIdentifier, setUniqueIdentifier] = useState('');
   const [openCount, setOpenCount] = useState(0);
   // eslint-disable-next-line
   const [player_name, setPlayerName] = useState('');
@@ -33,13 +38,14 @@ function CreateMyModelForm() {
   const [player_pref, setPlayerPref] = useState('');
   // eslint-disable-next-line
   const [open_or_close, setOpenOrClosed] = useState('');
-  const [opponent_manager, setopponent_manager] = useState('');
-  const [opponent_team, setopponent_team ] = useState('');
-  const [send_v_receive, setopponent_send_v_receive] = useState('');
+  //const [opponent_manager, setopponent_manager] = useState('');
+  //const [opponent_team, setopponent_team ] = useState('');
+  //const [send_v_receive, setopponent_send_v_receive] = useState('');
   const [errors, setErrors] = useState({});
   
 
   //const client = new ClientJS();
+
 
 
   const [elapsedTime, dispatch] = useReducer((state, action) => {
@@ -53,6 +59,37 @@ function CreateMyModelForm() {
     }
   }, 0);
 
+const [pageState, setPageState] = useState(JSON.parse(localStorage.getItem('pageState')) || 'Form');
+const [uniqueIdentifier, setUniqueIdentifier] = useState(JSON.parse(localStorage.getItem('uniqueIdentifier')) || '');
+const [opponent_manager, setopponent_manager] = useState(JSON.parse(localStorage.getItem('opponent_manager')) || '');
+const [opponent_team, setopponent_team ] = useState(JSON.parse(localStorage.getItem('opponent_team')) || '');
+const [send_v_receive, setSend_v_receive] = useState(JSON.parse(localStorage.getItem('send_v_receive')) || '');
+
+useEffect(() => {
+  localStorage.setItem('pageState', JSON.stringify(pageState));
+  localStorage.setItem('uniqueIdentifier', JSON.stringify(uniqueIdentifier));
+  localStorage.setItem('opponent_manager', JSON.stringify(opponent_manager));
+  localStorage.setItem('opponent_team', JSON.stringify(opponent_team));
+  localStorage.setItem('send_v_receive', JSON.stringify(send_v_receive));
+}, [pageState, uniqueIdentifier, opponent_manager, opponent_team, send_v_receive]);
+
+
+const handleReset = () => {
+  setPageState('Form');
+  localStorage.removeItem('uniqueIdentifier');
+  localStorage.removeItem('opponent_manager');
+  localStorage.removeItem('opponent_team');
+  localStorage.removeItem('send_v_receive');
+  setPlayerName('');
+  setTeamName('');
+  setTeamLeague('');
+  setPlayerNumb('');
+  setMatchPref('Any');
+  setPlayerPref('Any');
+  setOpenCount(0);        
+  dispatch({ type: 'reset' });
+};
+
 
 
   const handleChange = (event) => {
@@ -64,27 +101,37 @@ function CreateMyModelForm() {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+    if (formData.ip === ''){
+        axios.get('https://api.ipify.org?format=json')
+      .then(response7 => {
+        formData.ip = response7.data.ip;
+      })
+      .catch(error => {
+        console.error(error);
+      });
+    }
     try {
       const response = await axios.post(`http://${LocalHost}:8000/api/myendpoint/`, formData);
       console.log(response.data);
       console.log(response.data.success);
       if (response.data.success === true) {
-      setShowForm(false); // Hide the form
-      setInQueue(true); // Show the timer
+       setPageState('Queue') // Hide the form
+       // Show the timer
       setUniqueIdentifier(response.data.Unique_Identifier);
       console.log(response.data.Unique_Identifier); // Set the unique identifier
-    } else setErrors(response.data.message);
+    } 
+    else setErrors(response.data.message);
   } catch (error) {
       console.error(error);
     }
   };
 
-  const handleLeaveQueue = () => {
-    axios.put(`http://${LocalHost}:8000/api/myendpoint/${uniqueIdentifier}/close/`)
-      .then(response => {
-        console.log(response.data);
-        setInQueue(false);
-        setShowForm(true);
+  const handleLeaveQueue = async () => {
+    try {
+      const response4 = await axios.put(`http://${LocalHost}:8000/api/myendpoint/${uniqueIdentifier}/close/`);
+      if (response4.data.success === true) {  
+        console.log(response4.data);
+        setPageState('Form');
         setPlayerName('');
         setTeamName('');
         setTeamLeague('');
@@ -93,17 +140,20 @@ function CreateMyModelForm() {
         setPlayerPref('Any');
         setOpenCount(0);        
         dispatch({ type: 'reset' });
-
-
-      })
-      .catch(error => {
-        console.log(error);
-      });
+      } else if (response4.data.success === false) {
+        window.alert(response4.data.message);
+      }
+    } catch (error) {
+      console.error(error);
+    }
   };
+
+  
+
 
   useEffect(() => {
 
-    if (showForm) {
+    if (pageState === 'Form') {
       const options = {
         excludeJsFonts: true,
         excludeWebGL: true,
@@ -125,6 +175,7 @@ function CreateMyModelForm() {
       .catch(error => {
         console.error(error);
       });
+      
       const fetchData = async () => {
         try {
           const response = await axios.get(`http://${LocalHost}:8000/api/opencount/`);
@@ -138,7 +189,7 @@ function CreateMyModelForm() {
       
     }
   
-    if (InQueue) {
+    if (pageState === 'Queue') {
       const fetchData = async () => {
         try {
           const response1 = await axios.get(`http://${LocalHost}:8000/api/myendpoint/${uniqueIdentifier}/`);
@@ -155,16 +206,40 @@ function CreateMyModelForm() {
           // eslint-disable-next-line
           setOpenOrClosed(response1.data.open_or_close);
           // if response1.data.Opponent_Unique_Identifier is not null, then state = 'MatchedScreen'
-          
-          if (response1.data.opponent_team != null) {
-            setInQueue(false);
-            setmatched(true);
-            setopponent_manager(response1.data.opponent_manager);
-            setopponent_team(response1.data.opponent_team);
-            setopponent_send_v_receive(response1.data.send_v_receive);
 
+          if (response1.data.open_or_close === 'Suspended') {
+            setPageState('Suspended');
+            const userResponse = window.confirm("Are you still there?");
+            if (userResponse) {
+              const response3 = await axios.put(`http://${LocalHost}:8000/api/myendpoint/${uniqueIdentifier}/resume/`)
+              if (response3.data.success === true) {
+                setPageState('Queue');
+              }
+             if (response3.data.success === false) {
+              window.alert(response3.data.message);
+              setPageState('Form');
+              setPlayerName('');
+              setTeamName('');
+              setTeamLeague('');
+              setPlayerNumb('');
+              setMatchPref('Any');
+              setPlayerPref('Any');
+              setOpenCount(0);        
+              dispatch({ type: 'reset' });
+                  }
+          }
           }
 
+        
+
+          
+          if (response1.data.opponent_team != null) {
+            setPageState('MatchedScreen');
+            setopponent_manager(response1.data.opponent_manager);
+            setopponent_team(response1.data.opponent_team);
+            setSend_v_receive(response1.data.send_v_receive);
+
+          }
           // Do something with the response data
         } catch (error) {
           console.error(error);
@@ -193,7 +268,7 @@ function CreateMyModelForm() {
     }
     
     // eslint-disable-next-line
-  }, [InQueue, uniqueIdentifier, dispatch]);
+  }, [pageState, uniqueIdentifier, dispatch]);
   
   
   const minutes = Math.floor(elapsedTime / 60);
@@ -215,7 +290,7 @@ function CreateMyModelForm() {
 <div className="center2" style={{ textAlign: 'left', margin: 'auto', marginLeft: '20px'}}>
 <h3>Pro Clubs Nation's Friendly Queue </h3>
 
-{showForm && (
+{pageState === 'Form' && (
   <form onSubmit={handleSubmit}>
     <h4>Please fill out the information below to sign up for the queue:</h4>
     <label>
@@ -283,7 +358,7 @@ function CreateMyModelForm() {
     <button type="submit" className ="btn btn-success" style={{ backgroundColor: 'green', fontSize: '20px', color: 'white', fontWeight: 'bold', padding: '10px 20px' }}>Submit</button>
   </form>
 )}
-      {InQueue && (
+      {pageState === 'Queue' && (
         <div>
           <p><b>Elapsed Time: </b>{minutes}:{seconds < 10 ? `0${seconds}` : seconds}</p>
           <p>Team Name: <b>{team_name}</b></p>
@@ -293,9 +368,10 @@ function CreateMyModelForm() {
           <p>Number of teams in queue: <b>{openCount}</b></p>
           <button style={{ backgroundColor: 'red', color: 'white', padding: '10px 20px', fontWeight: 'bold' }} onClick={handleLeaveQueue}>Leave Queue</button>
           <p style={{ color: 'red' }}><b>Note:</b> If you find a match outside of the queue please Leave Queue ASAP, repeated failure to do so may result in league punishments.</p>
+
         </div>
       )}
-      {showmatched && (
+      {pageState === 'MatchedScreen' && (
         <div>
           <p style={{ fontSize: '20px' }}><b>Match Found!</b></p>
           {send_v_receive === 'Send' && (
@@ -309,6 +385,8 @@ function CreateMyModelForm() {
 
           <p style={{ color: 'red' }}>If you suspect someone of queue dodging, report it to an admin immediately.</p>
           
+
+          <button onClick={handleReset} className="btn btn-success" style={{ backgroundColor: 'green', fontSize: '20px', color: 'white', fontWeight: 'bold', padding: '10px 20px' }}>Return to Sign up Page</button>
     </div>
       )}
     </div>
