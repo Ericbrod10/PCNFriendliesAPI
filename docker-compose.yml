@@ -15,11 +15,12 @@ services:
     volumes:
       - ./server/.dbdata:/var/lib/mysql
     command: --event-scheduler=ON
+
   web:
     build: .
     command: python manage.py runserver 0.0.0.0:8000
     volumes:
-    - .:/app
+      - .:/app
     ports:
       - "8000:8000"
     depends_on:
@@ -29,11 +30,18 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules
+    # volumes:
+    #   - certs:/etc/letsencrypt:ro
     ports:
-      - "3000:3000"
-    environment:
-      - CHOKIDAR_USEPOLLING=true
-    command: ["npm", "start"]
+      - "80:80"
+
+#   certbot:
+#     build:
+#       context: .
+#       dockerfile: Dockerfile.certbot
+#     volumes:
+#       - certs:/etc/letsencrypt
+#     command: certbot renew --quiet --no-random-sleep-on-renew
+
+# volumes:
+#   certs:

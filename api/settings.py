@@ -25,9 +25,11 @@ SECRET_KEY = 'o+r#cw@qs6tu1!=3gn7wnhv%2t5w2-rxg0md8=_5vl2)kab=3j'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+CORS_ORIGIN_ALLOW_ALL = True
+
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', 
                  #'192.168.1.243',
-                 '100.1.213.155'
+                 'pcn11smatchmaking.hopto.org'
                  ]
 
 
@@ -61,7 +63,8 @@ CORS_ORIGIN_WHITELIST = [
     'http://localhost:3000',
     'http://localhost:8000',
     #'http://192.168.1.243:3000',
-    'http://100.1.213.155:3000',
+    'http://100.1.213.155:80',
+    'http://pcn11smatchmaking.hopto.org:80',
 ]
 
 ROOT_URLCONF = 'api.urls'

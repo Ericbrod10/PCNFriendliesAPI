@@ -18,7 +18,7 @@ function CreateMyModelForm() {
   });
 
 
-  const LocalHost = '100.1.213.155';
+  const LocalHost = 'pcn11smatchmaking.hopto.org';
   //const LocalHost = '192.168.1.243';
   
 
@@ -27,7 +27,7 @@ function CreateMyModelForm() {
   //const [showmatched, setmatched] = useState(false);
   //const [SuspendQueue, setSuspendQueue] = useState(false);
   //const [uniqueIdentifier, setUniqueIdentifier] = useState('');
-  const [openCount, setOpenCount] = useState(0);
+  const [openCount, setOpenCount] = useState('');
   // eslint-disable-next-line
   const [player_name, setPlayerName] = useState('');
   const [team_name, setTeamName] = useState('');
@@ -112,13 +112,13 @@ const handleReset = () => {
     }
     try {
       const response = await axios.post(`http://${LocalHost}:8000/api/myendpoint/`, formData);
-      console.log(response.data);
-      console.log(response.data.success);
+      // console.log(response.data);
+      // console.log(response.data.success);
       if (response.data.success === true) {
        setPageState('Queue') // Hide the form
        // Show the timer
       setUniqueIdentifier(response.data.Unique_Identifier);
-      console.log(response.data.Unique_Identifier); // Set the unique identifier
+      // console.log(response.data.Unique_Identifier); // Set the unique identifier
     } 
     else setErrors(response.data.message);
   } catch (error) {
@@ -130,7 +130,7 @@ const handleReset = () => {
     try {
       const response4 = await axios.put(`http://${LocalHost}:8000/api/myendpoint/${uniqueIdentifier}/close/`);
       if (response4.data.success === true) {  
-        console.log(response4.data);
+        // console.log(response4.data);
         setPageState('Form');
         setPlayerName('');
         setTeamName('');
@@ -141,6 +141,18 @@ const handleReset = () => {
         setOpenCount(0);        
         dispatch({ type: 'reset' });
       } else if (response4.data.success === false) {
+        if(response4.data.message === 'Record Not Found.') {
+          setPageState('Form');
+          setPlayerName('');
+          setTeamName('');
+          setTeamLeague('');
+          setPlayerNumb('');
+          setMatchPref('Any');
+          setPlayerPref('Any');
+          setOpenCount(0);        
+          dispatch({ type: 'reset' });
+
+        }
         window.alert(response4.data.message);
       }
     } catch (error) {
@@ -194,6 +206,7 @@ const handleReset = () => {
         try {
           const response1 = await axios.get(`http://${LocalHost}:8000/api/myendpoint/${uniqueIdentifier}/`);
           console.log(response1.data);
+
           // Set each field to variable 
           // eslint-disable-next-line
           setPlayerName(response1.data.player_name); 
@@ -206,6 +219,8 @@ const handleReset = () => {
           // eslint-disable-next-line
           setOpenOrClosed(response1.data.open_or_close);
           // if response1.data.Opponent_Unique_Identifier is not null, then state = 'MatchedScreen'
+          // console.log(response1.data.opponent_team);
+          // console.log(response1.data.open_or_close);
 
           if (response1.data.open_or_close === 'Suspended') {
             setPageState('Suspended');
@@ -230,6 +245,17 @@ const handleReset = () => {
           }
           }
 
+          if(response1.data.open_or_close === 'Closed' && response1.data.opponent_team === null) {
+            setPageState('Form');
+            setPlayerName('');
+            setTeamName('');
+            setTeamLeague('');
+            setPlayerNumb('');
+            setMatchPref('Any');
+            setPlayerPref('Any');
+           }
+  
+
         
 
           
@@ -242,11 +268,20 @@ const handleReset = () => {
           }
           // Do something with the response data
         } catch (error) {
+          if (error.message === 'Request failed with status code 404'){
+            setPageState('Form');
+            setPlayerName('');
+            setTeamName('');
+            setTeamLeague('');
+            setPlayerNumb('');
+            setMatchPref('Any');
+            setPlayerPref('Any');
+          }
           console.error(error);
         }
         try {
           const response2 = await axios.get(`http://${LocalHost}:8000/api/opencount/`);
-          console.log(response2.data);
+          // console.log(response2.data);
           setOpenCount(response2.data.count); // Set the open count
         } catch (error) {
           console.error(error);
@@ -366,6 +401,7 @@ const handleReset = () => {
           <p>Match Preference: <b>{match_pref} League</b></p>
           <p>Player Preference: <b>{player_pref} # of Players</b></p>
           <p>Number of teams in queue: <b>{openCount}</b></p>
+          <p><b>Note:</b> Leave this screen open or you may be taken out of the queue for inactivity</p>
           <button style={{ backgroundColor: 'red', color: 'white', padding: '10px 20px', fontWeight: 'bold' }} onClick={handleLeaveQueue}>Leave Queue</button>
           <p style={{ color: 'red' }}><b>Note:</b> If you find a match outside of the queue please Leave Queue ASAP, repeated failure to do so may result in league punishments.</p>
 
