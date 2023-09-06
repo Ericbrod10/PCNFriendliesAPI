@@ -22,11 +22,6 @@ function CreateMyModelForm() {
   //const LocalHost = '192.168.1.243';
   
 
-  //const [pageState, setPageState] = useState('Form');
-  //const [InQueue, setInQueue] = useState(false);
-  //const [showmatched, setmatched] = useState(false);
-  //const [SuspendQueue, setSuspendQueue] = useState(false);
-  //const [uniqueIdentifier, setUniqueIdentifier] = useState('');
   const [openCount, setOpenCount] = useState('');
   // eslint-disable-next-line
   const [player_name, setPlayerName] = useState('');
@@ -38,15 +33,8 @@ function CreateMyModelForm() {
   const [player_pref, setPlayerPref] = useState('');
   // eslint-disable-next-line
   const [open_or_close, setOpenOrClosed] = useState('');
-  //const [opponent_manager, setopponent_manager] = useState('');
-  //const [opponent_team, setopponent_team ] = useState('');
-  //const [send_v_receive, setopponent_send_v_receive] = useState('');
   const [errors, setErrors] = useState({});
   
-
-  //const client = new ClientJS();
-
-
 
   const [elapsedTime, dispatch] = useReducer((state, action) => {
     switch (action.type) {
@@ -218,9 +206,6 @@ const handleReset = () => {
           setPlayerPref(response1.data.player_pref);
           // eslint-disable-next-line
           setOpenOrClosed(response1.data.open_or_close);
-          // if response1.data.Opponent_Unique_Identifier is not null, then state = 'MatchedScreen'
-          // console.log(response1.data.opponent_team);
-          // console.log(response1.data.open_or_close);
 
           if (response1.data.open_or_close === 'Suspended') {
             setPageState('Suspended');
@@ -323,7 +308,7 @@ const handleReset = () => {
     </div>
 
 <div className="center2" style={{ textAlign: 'left', margin: 'auto', marginLeft: '20px'}}>
-<h3>Pro Clubs Nation's Friendly Queue </h3>
+<h3>Pro Clubs Nation's Friendly Matchmaking Queue </h3>
 
 {pageState === 'Form' && (
   <form onSubmit={handleSubmit}>
@@ -389,6 +374,9 @@ const handleReset = () => {
       </label>
     </label>
     <p>Current Number of Teams waiting in queue: <b>{openCount}</b></p>
+    {console.log('What does the error say: ', errors.ip)}
+    {errors.ip && errors.ip.includes('This field may not be blank.') && <p style={{ color: 'red' }}>Error: There may be a issue with your ad blocker or VPN, please turn it off.<br/> Contact a admin if issue persists. </p>}
+
     
     <button type="submit" className ="btn btn-success" style={{ backgroundColor: 'green', fontSize: '20px', color: 'white', fontWeight: 'bold', padding: '10px 20px' }}>Submit</button>
   </form>
