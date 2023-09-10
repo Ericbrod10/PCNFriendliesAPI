@@ -35,17 +35,31 @@ services:
     ports:
       - "3000:3000"
 
-
-
   nginx:
     image: nginx:latest
     volumes:
       - ./nginx:/etc/nginx/conf.d
-#      - certs:/etc/letsencrypt
+      - certs:/etc/letsencrypt
+      - webroot:/var/www/certbot
     ports:
       - "80:80"
       - "443:443"
-#   nginx:
+    depends_on:
+      - web
+      - certbot
+
+  certbot:
+    image: certbot/certbot
+    volumes:
+      - certs:/etc/letsencrypt
+      - webroot:/var/www/certbot
+    command: certonly --staging --cert-name pcn11scert --webroot --webroot-path=/var/www/certbot --email proclubsnation2@gmail.com --agree-tos --no-eff-email --force-renewal -d pcn11smatchmaking.hopto.org
+    #command: certonly --staging --cert-name pcn11scert --webroot --webroot-path=/var/www/certbot --email proclubsnation2@gmail.com --agree-tos --no-eff-email --force-renewal -d pcn11smatchmaking.hopto.org
+
+volumes:
+  certs:
+  webroot:
+
 #     image: nginx:latest
 #     volumes:
 #       - ./nginx:/etc/nginx/conf.d
@@ -53,8 +67,6 @@ services:
 #     ports:
 #       - "80:80"
 #       - "443:443"
-#     depends_on:
-#       - web
 
 #   certbot:
 #     image: certbot/certbot
@@ -63,6 +75,5 @@ services:
 #     #command: certonly --cert-name pcn11scert --webroot --webroot-path=/etc/letsencrypt --email proclubsnation2@gmail.com --agree-tos --no-eff-email --force-renewal -d pcn11smatchmaking.hopto.org
 #     command: certonly --staging --cert-name pcn11scert --webroot --webroot-path=/etc/letsencrypt --email proclubsnation2@gmail.com --agree-tos --no-eff-email --force-renewal -d pcn11smatchmaking.hopto.org
     
-
 # volumes:
 #   certs:
