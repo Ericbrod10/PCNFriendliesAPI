@@ -30,18 +30,38 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-    # volumes:
-    #   - certs:/etc/letsencrypt:ro
+    volumes:
+      - ./path/to/your/ssl:/etc/ssl:ro
+    ports:
+      - "3000:3000"
+
+
+
+  nginx:
+    image: nginx:latest
+    volumes:
+      - ./nginx:/etc/nginx/conf.d
     ports:
       - "80:80"
+      - "443:443"
+#   nginx:
+#     image: nginx:latest
+#     volumes:
+#       - ./nginx:/etc/nginx/conf.d
+#       - certs:/etc/letsencrypt
+#     ports:
+#       - "80:80"
+#       - "443:443"
+#     depends_on:
+#       - web
 
 #   certbot:
-#     build:
-#       context: .
-#       dockerfile: Dockerfile.certbot
+#     image: certbot/certbot
 #     volumes:
 #       - certs:/etc/letsencrypt
-#     command: certbot renew --quiet --no-random-sleep-on-renew
+#     #command: certonly --cert-name pcn11scert --webroot --webroot-path=/etc/letsencrypt --email proclubsnation2@gmail.com --agree-tos --no-eff-email --force-renewal -d pcn11smatchmaking.hopto.org
+#     command: certonly --staging --cert-name pcn11scert --webroot --webroot-path=/etc/letsencrypt --email proclubsnation2@gmail.com --agree-tos --no-eff-email --force-renewal -d pcn11smatchmaking.hopto.org
+    
 
 # volumes:
 #   certs:
