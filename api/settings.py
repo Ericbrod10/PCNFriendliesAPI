@@ -13,15 +13,17 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 import os
 from pathlib import Path
 
-# BASE_DIR = Path(__file__).resolve().parent.parent
-# STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 
 SQLPassword = '2nC£62YFni`K89&KPl'
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-# BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 # Quick-start development settings - unsuitable for production
@@ -33,26 +35,16 @@ SECRET_KEY = '1d706cf77e69f6f96f92cfb22b1d0bee4210ee3a1d57cb1afc9211ebac3051c074
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-CORS_ORIGIN_ALLOW_ALL = False
-
-SESSION_COOKIE_SECURE = True
-CSRF_COOKIE_SECURE = True
-SECURE_CONTENT_TYPE_NOSNIFF = True
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-
-# Prevents clickjacking
-SECURE_BROWSER_XSS_FILTER = True
-X_FRAME_OPTIONS = 'DENY'
-
-CORS_ALLOWED_ORIGINS = [
-    "https://pcn11smatchmaking.hopto.org",
-    "http://pcn11smatchmaking.hopto.org"
-]
+CORS_ORIGIN_ALLOW_ALL = True
 
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', 
                  #'192.168.1.243',
                  'pcn11smatchmaking.hopto.org'
                  ]
+
+CORS_ALLOWED_ORIGINS = [
+    "https://pcn11smatchmaking.hopto.org"
+]
 
 
 # Application definition
@@ -78,16 +70,16 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'corsheaders.middleware.CorsMiddleware',
-    'django.middleware.common.CommonMiddleware'
+    'django.middleware.common.CommonMiddleware',
 ]
 
 CORS_ORIGIN_WHITELIST = [
-    # 'http://localhost:3000',
-    # 'http://localhost:8000',
+    'http://localhost:3000',
+    'http://localhost:8000',
     #'http://192.168.1.243:3000',
-    #'http://100.1.213.155:80',
-    #'http://pcn11smatchmaking.hopto.org:80',
-    # 'https://pcn11smatchmaking.hopto.org:443',
+    'http://100.1.213.155:80',
+    'https://pcn11smatchmaking.hopto.org',
+    'http://pcn11smatchmaking.hopto.org'
 ]
 
 ROOT_URLCONF = 'api.urls'
@@ -165,4 +157,3 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
 STATIC_URL = '/static/'
-

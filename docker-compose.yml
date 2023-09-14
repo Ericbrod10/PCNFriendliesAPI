@@ -32,7 +32,6 @@ services:
       dockerfile: Dockerfile
     ports:
       - "3000:3000"
-    restart: always
 
   nginx:
     image: nginx:latest
@@ -52,7 +51,7 @@ services:
     volumes:
       - certs:/etc/letsencrypt
       - webroot:/var/www/certbot
-    command: certonly --cert-name pcn11scert --webroot --webroot-path=/var/www/certbot --email proclubsnation2@gmail.com --agree-tos --no-eff-email --force-renewal -d pcn11smatchmaking.hopto.org
+    #command: certonly --staging --cert-name pcn11scert --webroot --webroot-path=/var/www/certbot --email proclubsnation2@gmail.com --agree-tos --no-eff-email --force-renewal -d pcn11smatchmaking.hopto.org
     #command: certonly --staging --cert-name pcn11scert --webroot --webroot-path=/var/www/certbot --email proclubsnation2@gmail.com --agree-tos --no-eff-email --force-renewal -d pcn11smatchmaking.hopto.org
 
 volumes:
