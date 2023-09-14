@@ -47,6 +47,19 @@ DO
      UPDATE api_mymodel
      SET open_or_close = 'Closed'
      WHERE open_or_close = 'Suspended' AND SuspendMessageSent < NOW() - INTERVAL 300 SECOND;
+          
+          
+    UPDATE api_mymodel AS t1
+      JOIN (
+        SELECT ip, MAX(datetime) as max_datetime
+        FROM api_mymodel
+        WHERE open_or_close IN ('Open', 'Started')
+        GROUP BY ip
+        HAVING COUNT(*) > 1
+    ) AS t2 ON t1.ip = t2.ip
+    SET t1.open_or_close = 'Closed'
+    WHERE t1.datetime < t2.max_datetime;
+
 
 
     UPDATE api_mymodel x 

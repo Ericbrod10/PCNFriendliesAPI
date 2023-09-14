@@ -10,8 +10,8 @@ services:
     environment:
       MYSQL_DATABASE: admin
       MYSQL_USER: Snowboarder
-      MYSQL_PASSWORD: root
-      MYSQL_ROOT_PASSWORD: root123
+      MYSQL_PASSWORD: 2nC£62YFni`K89&KPl
+      MYSQL_ROOT_PASSWORD: 2nC£62YFni`K89&KPl
     volumes:
       - ./server/.dbdata:/var/lib/mysql
     command: --event-scheduler=ON
@@ -30,10 +30,9 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-    volumes:
-      - ./path/to/your/ssl:/etc/ssl:ro
     ports:
       - "3000:3000"
+    restart: always
 
   nginx:
     image: nginx:latest
@@ -53,27 +52,9 @@ services:
     volumes:
       - certs:/etc/letsencrypt
       - webroot:/var/www/certbot
-    command: certonly --staging --cert-name pcn11scert --webroot --webroot-path=/var/www/certbot --email proclubsnation2@gmail.com --agree-tos --no-eff-email --force-renewal -d pcn11smatchmaking.hopto.org
+    command: certonly --cert-name pcn11scert --webroot --webroot-path=/var/www/certbot --email proclubsnation2@gmail.com --agree-tos --no-eff-email --force-renewal -d pcn11smatchmaking.hopto.org
     #command: certonly --staging --cert-name pcn11scert --webroot --webroot-path=/var/www/certbot --email proclubsnation2@gmail.com --agree-tos --no-eff-email --force-renewal -d pcn11smatchmaking.hopto.org
 
 volumes:
   certs:
   webroot:
-
-#     image: nginx:latest
-#     volumes:
-#       - ./nginx:/etc/nginx/conf.d
-#       - certs:/etc/letsencrypt
-#     ports:
-#       - "80:80"
-#       - "443:443"
-
-#   certbot:
-#     image: certbot/certbot
-#     volumes:
-#       - certs:/etc/letsencrypt
-#     #command: certonly --cert-name pcn11scert --webroot --webroot-path=/etc/letsencrypt --email proclubsnation2@gmail.com --agree-tos --no-eff-email --force-renewal -d pcn11smatchmaking.hopto.org
-#     command: certonly --staging --cert-name pcn11scert --webroot --webroot-path=/etc/letsencrypt --email proclubsnation2@gmail.com --agree-tos --no-eff-email --force-renewal -d pcn11smatchmaking.hopto.org
-    
-# volumes:
-#   certs:

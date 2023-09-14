@@ -18,7 +18,7 @@ function CreateMyModelForm() {
   });
 
 
-  const LocalHost = 'pcn11smatchmaking.hopto.org';
+  const LocalHost = 'https://pcn11smatchmaking.hopto.org';
   //const LocalHost = '192.168.1.243';
   
 
@@ -99,7 +99,7 @@ const handleReset = () => {
       });
     }
     try {
-      const response = await axios.post(`http://${LocalHost}:8000/api/myendpoint/`, formData);
+      const response = await axios.post(`${LocalHost}/api/myendpoint/`, formData);
       // console.log(response.data);
       // console.log(response.data.success);
       if (response.data.success === true) {
@@ -116,7 +116,7 @@ const handleReset = () => {
 
   const handleLeaveQueue = async () => {
     try {
-      const response4 = await axios.put(`http://${LocalHost}:8000/api/myendpoint/${uniqueIdentifier}/close/`);
+      const response4 = await axios.put(`${LocalHost}/api/myendpoint/${uniqueIdentifier}/close/`);
       if (response4.data.success === true) {  
         // console.log(response4.data);
         setPageState('Form');
@@ -178,7 +178,7 @@ const handleReset = () => {
       
       const fetchData = async () => {
         try {
-          const response = await axios.get(`http://${LocalHost}:8000/api/opencount/`);
+          const response = await axios.get(`${LocalHost}/api/opencount/`);
           setOpenCount(response.data.count); // Set the open count
         } catch (error) {
           console.error(error);
@@ -192,7 +192,7 @@ const handleReset = () => {
     if (pageState === 'Queue') {
       const fetchData = async () => {
         try {
-          const response1 = await axios.get(`http://${LocalHost}:8000/api/myendpoint/${uniqueIdentifier}/`);
+          const response1 = await axios.get(`${LocalHost}/api/myendpoint/${uniqueIdentifier}/`);
           console.log(response1.data);
 
           // Set each field to variable 
@@ -211,7 +211,7 @@ const handleReset = () => {
             setPageState('Suspended');
             const userResponse = window.confirm("Are you still there?");
             if (userResponse) {
-              const response3 = await axios.put(`http://${LocalHost}:8000/api/myendpoint/${uniqueIdentifier}/resume/`)
+              const response3 = await axios.put(`${LocalHost}/api/myendpoint/${uniqueIdentifier}/resume/`)
               if (response3.data.success === true) {
                 setPageState('Queue');
               }
@@ -265,7 +265,7 @@ const handleReset = () => {
           console.error(error);
         }
         try {
-          const response2 = await axios.get(`http://${LocalHost}:8000/api/opencount/`);
+          const response2 = await axios.get(`${LocalHost}/api/opencount/`);
           // console.log(response2.data);
           setOpenCount(response2.data.count); // Set the open count
         } catch (error) {
@@ -374,9 +374,8 @@ const handleReset = () => {
       </label>
     </label>
     <p>Current Number of Teams waiting in queue: <b>{openCount}</b></p>
-    {console.log('What does the error say: ', errors.ip)}
     {errors.ip && errors.ip.includes('This field may not be blank.') && <p style={{ color: 'red' }}>Error: There may be a issue with your ad blocker or VPN, please turn it off.<br/> Contact a admin if issue persists. </p>}
-
+    <p><b>Make sure your team is ready in the lobby before you click submit</b></p>
     
     <button type="submit" className ="btn btn-success" style={{ backgroundColor: 'green', fontSize: '20px', color: 'white', fontWeight: 'bold', padding: '10px 20px' }}>Submit</button>
   </form>
